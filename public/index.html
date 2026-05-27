@@ -21,6 +21,7 @@
 
 body {
   font-family: 'Galmuri11', monospace;
+  font-size: 11px;
   background: var(--pink-50);
   background-image: radial-gradient(var(--pink-200) 1.5px, transparent 1.5px);
   background-size: 14px 14px;
@@ -47,12 +48,12 @@ h1 {
   font-size: 28px;
   color: var(--pink-700);
   letter-spacing: 1px;
-  margin-bottom: 6px;
+  margin-bottom: 8px;
 }
 
 .subtitle {
-  font-family: 'Galmuri11', monospace;
-  font-size: 12px;
+  font-family: 'Galmuri14', 'Galmuri11', monospace;
+  font-size: 14px;
   color: var(--pink-700);
   opacity: 0.75;
   letter-spacing: 2px;
@@ -76,7 +77,7 @@ h1 {
   background: var(--pink-400);
   border: 3px solid var(--pink-700);
   box-shadow: 4px 4px 0 var(--pink-700);
-  padding: 20px 14px;
+  padding: 22px 14px;
   text-align: center;
   color: white;
   display: flex;
@@ -85,7 +86,8 @@ h1 {
 }
 
 .today-card .label {
-  font-size: 13px;
+  font-family: 'Galmuri14', 'Galmuri11', monospace;
+  font-size: 14px;
   letter-spacing: 2px;
   opacity: 0.95;
 }
@@ -94,11 +96,11 @@ h1 {
   font-family: 'Galmuri14', 'Galmuri11', monospace;
   font-size: 56px;
   line-height: 1.05;
-  margin: 6px 0 4px;
+  margin: 8px 0 6px;
   text-shadow: 3px 3px 0 var(--pink-700);
 }
 
-.today-card .sub { font-size: 13px; opacity: 0.95; }
+.today-card .sub { font-size: 11px; opacity: 0.95; }
 
 .others {
   display: grid;
@@ -110,9 +112,13 @@ h1 {
   background: var(--pink-50);
   border: 2px solid var(--pink-300);
   box-shadow: 3px 3px 0 var(--pink-300);
-  padding: 10px 4px;
+  padding: 14px 6px;
   text-align: center;
   transition: transform 0.1s steps(2);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 8px;
 }
 
 .stat:hover {
@@ -124,22 +130,14 @@ h1 {
   font-size: 11px;
   color: var(--pink-700);
   letter-spacing: 1px;
-  margin-bottom: 6px;
   white-space: nowrap;
 }
 
 .stat-value {
-  font-family: 'Galmuri14', 'Galmuri11', monospace;
+  font-family: 'Galmuri11', monospace;
   font-size: 22px;
   color: var(--pink-700);
   line-height: 1;
-}
-
-.stat-sub {
-  font-size: 11px;
-  color: var(--pink-700);
-  opacity: 0.65;
-  margin-top: 4px;
 }
 
 .graph-section {
@@ -151,7 +149,8 @@ h1 {
 }
 
 .graph-title {
-  font-size: 12px;
+  font-family: 'Galmuri14', 'Galmuri11', monospace;
+  font-size: 14px;
   color: var(--pink-700);
   letter-spacing: 1px;
   margin-bottom: 10px;
@@ -160,11 +159,11 @@ h1 {
   align-items: center;
 }
 
-.graph-title .legend { font-size: 11px; opacity: 0.7; }
+.graph-title .legend { font-size: 11px; opacity: 0.7; font-family: 'Galmuri11', monospace; }
 
 .graph-svg {
   width: 100%;
-  height: 90px;
+  height: 110px;
   display: block;
 }
 
@@ -200,7 +199,7 @@ footer {
 <div class="container">
   <header>
     <h1>🍓 어서오세요! 🐾</h1>
-    <div class="subtitle">★ VISITOR LOG · 방문자 발자국 ★</div>
+    <div class="subtitle">★ VISITOR LOG ★</div>
   </header>
 
   <div class="stats-row">
@@ -214,44 +213,39 @@ footer {
       <div class="stat">
         <div class="stat-label">YESTERDAY</div>
         <div class="stat-value" id="yesterday">-</div>
-        <div class="stat-sub">어제</div>
       </div>
       <div class="stat">
         <div class="stat-label">THIS WEEK</div>
         <div class="stat-value" id="thisWeek">-</div>
-        <div class="stat-sub">이번주</div>
       </div>
       <div class="stat">
         <div class="stat-label">LAST WEEK</div>
         <div class="stat-value" id="lastWeek">-</div>
-        <div class="stat-sub">지난주</div>
       </div>
       <div class="stat">
         <div class="stat-label">THIS MONTH</div>
         <div class="stat-value" id="thisMonth">-</div>
-        <div class="stat-sub">이번달</div>
       </div>
       <div class="stat">
         <div class="stat-label">LAST MONTH</div>
         <div class="stat-value" id="lastMonth">-</div>
-        <div class="stat-sub">지난달</div>
       </div>
     </div>
   </div>
 
   <div class="graph-section">
     <div class="graph-title">
-      <span>♥ 최근 14일 발자국</span>
+      <span>♥ LAST 14 DAYS</span>
       <span class="legend" id="graph-max">max: -</span>
     </div>
-    <svg class="graph-svg" id="graph-svg" viewBox="0 0 280 90" preserveAspectRatio="none" shape-rendering="crispEdges"></svg>
+    <svg class="graph-svg" id="graph-svg" viewBox="0 0 280 110" preserveAspectRatio="none"></svg>
     <div class="graph-axis">
-      <span>14일 전</span>
-      <span>오늘</span>
+      <span>- 14d</span>
+      <span>TODAY</span>
     </div>
   </div>
 
-  <footer>★ MADE WITH 🍓 FOR 희멍 ★</footer>
+  <footer>★ 🍓 FOR HEEWOOF ★</footer>
 </div>
 
 <script>
@@ -260,20 +254,43 @@ function renderGraph(daily) {
   const max = Math.max(...daily.map(d => d.count), 1);
   document.getElementById('graph-max').textContent = `max: ${max}`;
 
-  const W = 280, H = 90;
+  const W = 280, H = 110;
+  const padX = 6, padY = 8;
+  const availW = W - 2 * padX;
+  const availH = H - 2 * padY;
   const n = daily.length;
-  const gap = 3;
-  const barW = (W - gap * (n - 1)) / n;
+
+  // 각 점의 좌표
+  const points = daily.map((d, i) => {
+    const x = padX + (i / (n - 1)) * availW;
+    const y = padY + availH - (d.count / max) * availH;
+    return { x, y, count: d.count, date: d.date };
+  });
+
+  // 선 경로
+  const linePath = points.map((p, i) =>
+    `${i === 0 ? 'M' : 'L'} ${p.x.toFixed(2)} ${p.y.toFixed(2)}`
+  ).join(' ');
+
+  // 아래 채우기 영역
+  const areaPath = linePath +
+    ` L ${(W - padX).toFixed(2)} ${(H - padY).toFixed(2)}` +
+    ` L ${padX.toFixed(2)} ${(H - padY).toFixed(2)} Z`;
+
+  // 점들
+  const dots = points.map((p, i) => {
+    const isToday = i === n - 1;
+    const r = isToday ? 4 : 2.5;
+    const fill = isToday ? '#ff6b8a' : '#ff8fa8';
+    return `<circle cx="${p.x.toFixed(2)}" cy="${p.y.toFixed(2)}" r="${r}" fill="${fill}" stroke="white" stroke-width="${isToday ? 2 : 1}" vector-effect="non-scaling-stroke"><title>${p.date}: ${p.count}</title></circle>`;
+  }).join('');
 
   const svg = document.getElementById('graph-svg');
-  svg.innerHTML = daily.map((d, i) => {
-    const h = d.count > 0 ? Math.max((d.count / max) * (H - 4), 3) : 0;
-    const x = i * (barW + gap);
-    const y = H - h;
-    const isToday = i === n - 1;
-    const color = isToday ? '#ff6b8a' : (d.count > 0 ? '#ffb6c1' : '#ffe4ed');
-    return `<rect x="${x}" y="${y}" width="${barW}" height="${h}" fill="${color}"><title>${d.date}: ${d.count}</title></rect>`;
-  }).join('');
+  svg.innerHTML = `
+    <path d="${areaPath}" fill="#ffb6c1" opacity="0.35"/>
+    <path d="${linePath}" fill="none" stroke="#ff6b8a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" vector-effect="non-scaling-stroke"/>
+    ${dots}
+  `;
 }
 
 async function loadStats() {
