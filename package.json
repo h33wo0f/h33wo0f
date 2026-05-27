@@ -1,0 +1,9 @@
+{
+  "name": "himung-visitor-log",
+  "version": "1.0.0",
+  "description": "희멍's Notion visitor counter widget",
+  "private": true,
+  "dependencies": {
+    "@upstash/redis": "^1.34.3"
+  }
+}
