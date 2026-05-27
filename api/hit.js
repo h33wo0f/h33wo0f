@@ -8,18 +8,24 @@ function toKstDateString(date) {
   return kst.toISOString().slice(0, 10);
 }
 
-// 오늘(KST) 기준 N일 전 날짜 key
 function daysAgoKey(n) {
   const d = new Date();
   d.setUTCDate(d.getUTCDate() - n);
   return toKstDateString(d);
 }
 
-// KST 기준 weeksAgo주의 월~일 7일 날짜 배열
+// 오래된 → 최신 순 N일 날짜 배열
+function lastNDays(n) {
+  const dates = [];
+  for (let i = n - 1; i >= 0; i--) dates.push(daysAgoKey(i));
+  return dates;
+}
+
+// KST 기준 weeksAgo주의 월~일 7일
 function weekDates(weeksAgo) {
   const now = new Date();
   const kst = new Date(now.getTime() + 9 * 60 * 60 * 1000);
-  const day = kst.getUTCDay(); // 0=Sun, 1=Mon...
+  const day = kst.getUTCDay();
   const offsetToMonday = (day + 6) % 7;
 
   const monday = new Date(kst);
@@ -34,15 +40,15 @@ function weekDates(weeksAgo) {
   return dates;
 }
 
-// KST 기준 monthsAgo개월 전 달의 모든 날짜 배열
+// KST 기준 monthsAgo개월 전 달의 모든 날짜
 function monthDates(monthsAgo) {
   const now = new Date();
   const kst = new Date(now.getTime() + 9 * 60 * 60 * 1000);
-  const targetYear = kst.getUTCFullYear();
-  const targetMonth = kst.getUTCMonth() - monthsAgo;
+  const year = kst.getUTCFullYear();
+  const month = kst.getUTCMonth() - monthsAgo;
 
-  const firstDay = new Date(Date.UTC(targetYear, targetMonth, 1));
-  const lastDay = new Date(Date.UTC(targetYear, targetMonth + 1, 0));
+  const firstDay = new Date(Date.UTC(year, month, 1));
+  const lastDay = new Date(Date.UTC(year, month + 1, 0));
 
   const dates = [];
   for (let i = 1; i <= lastDay.getUTCDate(); i++) {
@@ -59,25 +65,35 @@ async function sumKeys(dates) {
   return values.reduce((sum, v) => sum + (parseInt(v) || 0), 0);
 }
 
+async function getDaily(dates) {
+  if (!dates.length) return [];
+  const keys = dates.map(d => `hits:${d}`);
+  const values = await redis.mget(...keys);
+  return dates.map((date, i) => ({
+    date,
+    count: parseInt(values[i]) || 0,
+  }));
+}
+
 export default async function handler(req, res) {
-  // 노션 iframe에서 호출 가능하도록
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Cache-Control', 'no-store, max-age=0');
 
   try {
     const today = daysAgoKey(0);
 
-    // 1) 방문 카운트 +1
+    // 1) 카운트 +1
     await redis.incr(`hits:${today}`);
 
-    // 2) 통계 집계
-    const [todayCount, yesterdayCount, thisWeek, lastWeek, thisMonth, lastMonth] = await Promise.all([
+    // 2) 통계 + 일별 14일
+    const [todayCount, yesterdayCount, thisWeek, lastWeek, thisMonth, lastMonth, daily] = await Promise.all([
       sumKeys([today]),
       sumKeys([daysAgoKey(1)]),
       sumKeys(weekDates(0)),
       sumKeys(weekDates(1)),
       sumKeys(monthDates(0)),
       sumKeys(monthDates(1)),
+      getDaily(lastNDays(14)),
     ]);
 
     res.status(200).json({
@@ -87,6 +103,7 @@ export default async function handler(req, res) {
       lastWeek,
       thisMonth,
       lastMonth,
+      daily,
     });
   } catch (e) {
     res.status(500).json({ error: 'tracking failed', detail: String(e) });
