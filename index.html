@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>희멍's Visitor Log 🍓</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DotGothic16&display=swap" rel="stylesheet">
+<style>
+@font-face {
+  font-family: 'DungGeunMo';
+  src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2107@1.1/DungGeunMo.woff') format('woff');
+  font-display: swap;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --pink-50:  #fff5f8;
+  --pink-100: #ffe4ed;
+  --pink-200: #ffd1dc;
+  --pink-300: #ffb6c1;
+  --pink-400: #ff8fa8;
+  --pink-500: #ff6b8a;
+  --pink-700: #d4566f;
+  --pink-900: #5a3d4a;
+}
+
+body {
+  font-family: 'DungGeunMo', 'DotGothic16', monospace;
+  background: var(--pink-50);
+  background-image: radial-gradient(var(--pink-200) 1.5px, transparent 1.5px);
+  background-size: 14px 14px;
+  color: var(--pink-900);
+  padding: 20px;
+  min-height: 100vh;
+  -webkit-font-smoothing: none;
+  -moz-osx-font-smoothing: none;
+}
+
+.container {
+  max-width: 760px;
+  margin: 0 auto;
+  background: #ffffff;
+  border: 3px solid var(--pink-700);
+  box-shadow: 6px 6px 0 var(--pink-700);
+  padding: 24px;
+}
+
+header { text-align: center; margin-bottom: 18px; }
+
+h1 {
+  font-size: 28px;
+  color: var(--pink-700);
+  letter-spacing: 1px;
+  margin-bottom: 6px;
+}
+
+.subtitle {
+  font-family: 'DotGothic16', monospace;
+  font-size: 11px;
+  color: var(--pink-700);
+  opacity: 0.75;
+  letter-spacing: 2px;
+}
+
+.stats-row {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+@media (min-width: 600px) {
+  .stats-row {
+    grid-template-columns: 1.4fr 3.6fr;
+    align-items: stretch;
+  }
+}
+
+.today-card {
+  background: var(--pink-400);
+  border: 3px solid var(--pink-700);
+  box-shadow: 4px 4px 0 var(--pink-700);
+  padding: 20px 14px;
+  text-align: center;
+  color: white;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.today-card .label {
+  font-family: 'DotGothic16', monospace;
+  font-size: 12px;
+  letter-spacing: 2px;
+  opacity: 0.95;
+}
+
+.today-card .count {
+  font-size: 56px;
+  line-height: 1.05;
+  margin: 6px 0 4px;
+  text-shadow: 3px 3px 0 var(--pink-700);
+}
+
+.today-card .sub { font-size: 13px; opacity: 0.95; }
+
+.others {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 8px;
+}
+
+.stat {
+  background: var(--pink-50);
+  border: 2px solid var(--pink-300);
+  box-shadow: 3px 3px 0 var(--pink-300);
+  padding: 10px 4px;
+  text-align: center;
+  transition: transform 0.1s steps(2);
+}
+
+.stat:hover {
+  transform: translate(-1px, -1px);
+  box-shadow: 4px 4px 0 var(--pink-300);
+}
+
+.stat-label {
+  font-family: 'DotGothic16', monospace;
+  font-size: 9px;
+  color: var(--pink-700);
+  letter-spacing: 1px;
+  margin-bottom: 6px;
+  white-space: nowrap;
+}
+
+.stat-value {
+  font-size: 22px;
+  color: var(--pink-700);
+  line-height: 1;
+}
+
+.stat-sub {
+  font-size: 10px;
+  color: var(--pink-700);
+  opacity: 0.65;
+  margin-top: 4px;
+}
+
+.graph-section {
+  background: var(--pink-50);
+  border: 2px solid var(--pink-300);
+  box-shadow: 3px 3px 0 var(--pink-300);
+  padding: 14px;
+  margin-bottom: 14px;
+}
+
+.graph-title {
+  font-family: 'DotGothic16', monospace;
+  font-size: 11px;
+  color: var(--pink-700);
+  letter-spacing: 1px;
+  margin-bottom: 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.graph-title .legend { font-size: 10px; opacity: 0.7; }
+
+.graph-svg {
+  width: 100%;
+  height: 90px;
+  display: block;
+}
+
+.graph-axis {
+  display: flex;
+  justify-content: space-between;
+  font-family: 'DotGothic16', monospace;
+  font-size: 9px;
+  color: var(--pink-700);
+  opacity: 0.6;
+  margin-top: 6px;
+  letter-spacing: 1px;
+}
+
+footer {
+  text-align: center;
+  font-family: 'DotGothic16', monospace;
+  font-size: 10px;
+  color: var(--pink-700);
+  opacity: 0.6;
+  letter-spacing: 1px;
+}
+
+.loading { opacity: 0.4; }
+.error { color: #c4756e !important; }
+
+@media (max-width: 520px) {
+  .others { grid-template-columns: repeat(3, 1fr); }
+  h1 { font-size: 22px; }
+  .today-card .count { font-size: 44px; }
+}
+</style>
+</head>
+<body>
+<div class="container">
+  <header>
+    <h1>🍓 희멍'S PLACE 🐾</h1>
+    <div class="subtitle">★ VISITOR LOG · 방문자 발자국 ★</div>
+  </header>
+
+  <div class="stats-row">
+    <div class="today-card">
+      <div class="label">TODAY</div>
+      <div class="count loading" id="today">0</div>
+      <div class="sub" id="message">로딩 중...</div>
+    </div>
+
+    <div class="others">
+      <div class="stat">
+        <div class="stat-label">YESTERDAY</div>
+        <div class="stat-value" id="yesterday">-</div>
+        <div class="stat-sub">어제</div>
+      </div>
+      <div class="stat">
+        <div class="stat-label">THIS WEEK</div>
+        <div class="stat-value" id="thisWeek">-</div>
+        <div class="stat-sub">이번주</div>
+      </div>
+      <div class="stat">
+        <div class="stat-label">LAST WEEK</div>
+        <div class="stat-value" id="lastWeek">-</div>
+        <div class="stat-sub">지난주</div>
+      </div>
+      <div class="stat">
+        <div class="stat-label">THIS MONTH</div>
+        <div class="stat-value" id="thisMonth">-</div>
+        <div class="stat-sub">이번달</div>
+      </div>
+      <div class="stat">
+        <div class="stat-label">LAST MONTH</div>
+        <div class="stat-value" id="lastMonth">-</div>
+        <div class="stat-sub">지난달</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="graph-section">
+    <div class="graph-title">
+      <span>♥ 최근 14일 발자국</span>
+      <span class="legend" id="graph-max">max: -</span>
+    </div>
+    <svg class="graph-svg" id="graph-svg" viewBox="0 0 280 90" preserveAspectRatio="none" shape-rendering="crispEdges"></svg>
+    <div class="graph-axis">
+      <span>14일 전</span>
+      <span>오늘</span>
+    </div>
+  </div>
+
+  <footer>★ MADE WITH 🍓 FOR 희멍 ★</footer>
+</div>
+
+<script>
+function renderGraph(daily) {
+  if (!daily || !daily.length) return;
+  const max = Math.max(...daily.map(d => d.count), 1);
+  document.getElementById('graph-max').textContent = `max: ${max}`;
+
+  const W = 280, H = 90;
+  const n = daily.length;
+  const gap = 3;
+  const barW = (W - gap * (n - 1)) / n;
+
+  const svg = document.getElementById('graph-svg');
+  svg.innerHTML = daily.map((d, i) => {
+    const h = d.count > 0 ? Math.max((d.count / max) * (H - 4), 3) : 0;
+    const x = i * (barW + gap);
+    const y = H - h;
+    const isToday = i === n - 1;
+    const color = isToday ? '#ff6b8a' : (d.count > 0 ? '#ffb6c1' : '#ffe4ed');
+    return `<rect x="${x}" y="${y}" width="${barW}" height="${h}" fill="${color}"><title>${d.date}: ${d.count}</title></rect>`;
+  }).join('');
+}
+
+async function loadStats() {
+  try {
+    const res = await fetch('/api/hit', { cache: 'no-store' });
+    if (!res.ok) throw new Error('API error');
+    const data = await res.json();
+
+    document.getElementById('today').textContent = data.today.toLocaleString();
+    document.getElementById('today').classList.remove('loading');
+    document.getElementById('yesterday').textContent = data.yesterday.toLocaleString();
+    document.getElementById('thisWeek').textContent = data.thisWeek.toLocaleString();
+    document.getElementById('lastWeek').textContent = data.lastWeek.toLocaleString();
+    document.getElementById('thisMonth').textContent = data.thisMonth.toLocaleString();
+    document.getElementById('lastMonth').textContent = data.lastMonth.toLocaleString();
+
+    const msg = document.getElementById('message');
+    if (data.today === 0) msg.textContent = '아직 발자국 없음 🌱';
+    else if (data.today === 1) msg.textContent = '1명이 다녀갔어요 🍓';
+    else msg.textContent = `${data.today}명이 다녀갔어요 🍓`;
+
+    if (data.daily) renderGraph(data.daily);
+  } catch (e) {
+    const today = document.getElementById('today');
+    today.classList.remove('loading');
+    today.classList.add('error');
+    document.getElementById('message').textContent = '연결 실패 😢';
+  }
+}
+
+loadStats();
+</script>
+</body>
+</html>
