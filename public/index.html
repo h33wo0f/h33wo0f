@@ -144,7 +144,7 @@ h1 {
   background: var(--pink-50);
   border: 2px solid var(--pink-300);
   box-shadow: 3px 3px 0 var(--pink-300);
-  padding: 14px;
+  padding: 16px;
   margin-bottom: 14px;
 }
 
@@ -153,7 +153,7 @@ h1 {
   font-size: 14px;
   color: var(--pink-700);
   letter-spacing: 1px;
-  margin-bottom: 10px;
+  margin-bottom: 12px;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -163,18 +163,32 @@ h1 {
 
 .graph-svg {
   width: 100%;
-  height: 110px;
+  height: 90px;
   display: block;
 }
 
-.graph-axis {
+.graph-legend {
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 6px;
   font-size: 11px;
   color: var(--pink-700);
-  opacity: 0.6;
-  margin-top: 6px;
+  opacity: 0.7;
+  margin-top: 8px;
   letter-spacing: 1px;
+}
+
+.legend-scale {
+  display: flex;
+  gap: 2px;
+}
+
+.legend-scale span {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  border-radius: 2px;
 }
 
 footer {
@@ -238,10 +252,17 @@ footer {
       <span>♥ LAST 14 DAYS</span>
       <span class="legend" id="graph-max">max: -</span>
     </div>
-    <svg class="graph-svg" id="graph-svg" viewBox="0 0 280 110" preserveAspectRatio="none"></svg>
-    <div class="graph-axis">
-      <span>- 14d</span>
-      <span>TODAY</span>
+    <svg class="graph-svg" id="graph-svg" viewBox="0 0 280 80" preserveAspectRatio="xMidYMid meet"></svg>
+    <div class="graph-legend">
+      <span>less</span>
+      <span class="legend-scale">
+        <span style="background:#ffe4ed"></span>
+        <span style="background:#ffd1dc"></span>
+        <span style="background:#ffb6c1"></span>
+        <span style="background:#ff8fa8"></span>
+        <span style="background:#ff6b8a"></span>
+      </span>
+      <span>more</span>
     </div>
   </div>
 
@@ -254,43 +275,34 @@ function renderGraph(daily) {
   const max = Math.max(...daily.map(d => d.count), 1);
   document.getElementById('graph-max').textContent = `max: ${max}`;
 
-  const W = 280, H = 110;
-  const padX = 6, padY = 8;
-  const availW = W - 2 * padX;
-  const availH = H - 2 * padY;
-  const n = daily.length;
+  const W = 280, H = 80;
+  const padX = 4, padY = 4;
+  const gap = 4;
+  const cols = 7, rows = 2;
+  const cellW = (W - padX*2 - gap*(cols-1)) / cols;
+  const cellH = (H - padY*2 - gap*(rows-1)) / rows;
 
-  // 각 점의 좌표
-  const points = daily.map((d, i) => {
-    const x = padX + (i / (n - 1)) * availW;
-    const y = padY + availH - (d.count / max) * availH;
-    return { x, y, count: d.count, date: d.date };
-  });
+  function colorFor(count) {
+    if (count === 0) return '#ffe4ed';
+    const t = max === 0 ? 0 : count / max;
+    if (t <= 0.25) return '#ffd1dc';
+    if (t <= 0.5)  return '#ffb6c1';
+    if (t <= 0.75) return '#ff8fa8';
+    return '#ff6b8a';
+  }
 
-  // 선 경로
-  const linePath = points.map((p, i) =>
-    `${i === 0 ? 'M' : 'L'} ${p.x.toFixed(2)} ${p.y.toFixed(2)}`
-  ).join(' ');
-
-  // 아래 채우기 영역
-  const areaPath = linePath +
-    ` L ${(W - padX).toFixed(2)} ${(H - padY).toFixed(2)}` +
-    ` L ${padX.toFixed(2)} ${(H - padY).toFixed(2)} Z`;
-
-  // 점들
-  const dots = points.map((p, i) => {
-    const isToday = i === n - 1;
-    const r = isToday ? 4 : 2.5;
-    const fill = isToday ? '#ff6b8a' : '#ff8fa8';
-    return `<circle cx="${p.x.toFixed(2)}" cy="${p.y.toFixed(2)}" r="${r}" fill="${fill}" stroke="white" stroke-width="${isToday ? 2 : 1}" vector-effect="non-scaling-stroke"><title>${p.date}: ${p.count}</title></circle>`;
+  const cells = daily.map((d, i) => {
+    const col = i % cols;
+    const row = Math.floor(i / cols);
+    const x = padX + col * (cellW + gap);
+    const y = padY + row * (cellH + gap);
+    const isToday = i === daily.length - 1;
+    const stroke = isToday ? '#d4566f' : 'none';
+    const sw = isToday ? 2 : 0;
+    return `<rect x="${x.toFixed(2)}" y="${y.toFixed(2)}" width="${cellW.toFixed(2)}" height="${cellH.toFixed(2)}" fill="${colorFor(d.count)}" stroke="${stroke}" stroke-width="${sw}" vector-effect="non-scaling-stroke" rx="3"><title>${d.date}: ${d.count}</title></rect>`;
   }).join('');
 
-  const svg = document.getElementById('graph-svg');
-  svg.innerHTML = `
-    <path d="${areaPath}" fill="#ffb6c1" opacity="0.35"/>
-    <path d="${linePath}" fill="none" stroke="#ff6b8a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" vector-effect="non-scaling-stroke"/>
-    ${dots}
-  `;
+  document.getElementById('graph-svg').innerHTML = cells;
 }
 
 async function loadStats() {
